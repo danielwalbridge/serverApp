@@ -1,6 +1,8 @@
 package com.example.serverapp.controller;
 
 import com.example.serverapp.communication.ServerCommunication;
+import org.json.JSONObject;
+import org.json.XML;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -63,14 +65,17 @@ public class ServerController {
                     .GET()
                     .build();
 
+            // gets data back from good reads.
             HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
-            System.out.println(response);
-            System.out.println(response.body());
+
+            // convert into json format
+           JSONObject json = XML.toJSONObject(response.body());
+            System.out.println(json.toString(1));
+
             // send request
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // gets data back from good reads.
 
 
         return searchTerm;
