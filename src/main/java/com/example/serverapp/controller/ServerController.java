@@ -3,6 +3,7 @@ package com.example.serverapp.controller;
 import com.example.serverapp.communication.ServerCommunication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -35,8 +36,8 @@ public class ServerController {
         }
         return "Host Name of Server is : " + hostname + "ip of Server is : " + ip ;
     }
-    @GetMapping("/search")
-    public String getSearchTerm(String searchTerm) {
+    @GetMapping("/search/{searchTerm}")
+    public String getSearchTerm( @PathVariable String searchTerm) {
 
         // needs to take in the searchTerm passed in from the CLI app.
 
@@ -45,6 +46,6 @@ public class ServerController {
         // gets data back from good reads.
 
 
-        return "test";
+        return searchTerm;
     }
 }
