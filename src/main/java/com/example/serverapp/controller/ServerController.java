@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 @RestController
 @RequestMapping("/server")
@@ -48,8 +52,24 @@ public class ServerController {
             return " You must enter something for the search to work";
         }
 
-        // Then needs to call the goodreads app with the term.
+        // Need to write a get request to GoodReads
+        try {
 
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            // generate get to GoodReads
+            HttpRequest GETRequest = HttpRequest.newBuilder()
+                    .uri(new URI("https://www.goodreads.com/search/index.xml?q="+searchTerm+"&key=" + devKey))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
+            System.out.println(response);
+            System.out.println(response.body());
+            // send request
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // gets data back from good reads.
 
 
