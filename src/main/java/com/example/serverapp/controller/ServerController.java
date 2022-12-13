@@ -39,6 +39,10 @@ public class ServerController {
     @GetMapping("/search/{searchTerm}")
     public String getSearchTerm( @PathVariable String searchTerm) {
 
+        if ( searchTerm == null || searchTerm.isBlank()) {
+            return " You must enter something for the search to work";
+        }
+
         // needs to take in the searchTerm passed in from the CLI app.
 
         // Then needs to call the goodreads app with the term.
