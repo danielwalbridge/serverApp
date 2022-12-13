@@ -2,6 +2,7 @@ package com.example.serverapp.controller;
 
 import com.example.serverapp.communication.ServerCommunication;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,9 @@ public class ServerController {
 
     @Autowired
     private ServerCommunication serverCommunication;
+
+    @Value("${GoodReadsAPIKey}")
+    private String devKey;
 
     @GetMapping("/test")
     public String getData() {
@@ -39,11 +43,10 @@ public class ServerController {
     @GetMapping("/search/{searchTerm}")
     public String getSearchTerm( @PathVariable String searchTerm) {
 
+        // needs to take in the searchTerm passed in from the CLI app.
         if ( searchTerm == null || searchTerm.isBlank()) {
             return " You must enter something for the search to work";
         }
-
-        // needs to take in the searchTerm passed in from the CLI app.
 
         // Then needs to call the goodreads app with the term.
 
