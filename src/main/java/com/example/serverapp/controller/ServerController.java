@@ -35,4 +35,16 @@ public class ServerController {
         }
         return "Host Name of Server is : " + hostname + "ip of Server is : " + ip ;
     }
+    @GetMapping("/search")
+    public String getSearchTerm(String searchTerm) {
+
+        // needs to take in the searchTerm passed in from the CLI app.
+
+        // Then needs to call the goodreads app with the term.
+
+        // gets data back from good reads.
+
+
+        return "test";
+    }
 }
