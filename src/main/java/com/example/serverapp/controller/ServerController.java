@@ -81,7 +81,7 @@ public class ServerController {
             // gets data back from good reads.
             HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
 
-            // convert into json format Jackson
+            // convert into json format
             XmlMapper xmlMapper = new XmlMapper();
             JsonNode node = xmlMapper.readTree(response.body());
 
@@ -90,11 +90,7 @@ public class ServerController {
             String json = jsonMapper.writeValueAsString(node);
 
             // moving into nested objects.
-            JSONObject jsonObject = new JSONObject(json);
-            JSONObject jsonSearchObject = jsonObject.getJSONObject("search");
-            JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
-            JSONArray workArray = jsonResultsObject.getJSONArray("work");
-
+            JSONArray workArray = populateJSONArrayAfterNesting(json);
             // populate book list
             List<Book> bookList = populateBookListFromJSONArray(workArray);
             // create pretty result.
@@ -133,7 +129,7 @@ public class ServerController {
             // gets data back from good reads.
             HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
 
-            // convert into json format Jackson
+            // convert into json format
             XmlMapper xmlMapper = new XmlMapper();
             JsonNode node = xmlMapper.readTree(response.body());
 
@@ -142,11 +138,8 @@ public class ServerController {
             String json = jsonMapper.writeValueAsString(node);
 
             // moving into nested objects.
-            JSONObject jsonObject = new JSONObject(json);
-            JSONObject jsonSearchObject = jsonObject.getJSONObject("search");
-            JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
-            JSONArray workArray = jsonResultsObject.getJSONArray("work");
-
+            JSONArray workArray = populateJSONArrayAfterNesting(json);
+            // populate book list
             List<Book> bookList = populateBookListFromJSONArray(workArray);
             // create pretty result.
             jsonResultString = createPrettyJsonResult(bookList);
@@ -193,5 +186,21 @@ public class ServerController {
             bookList.add(book);
         }
         return bookList;
+    }
+
+    public JSONArray populateJSONArrayAfterNesting(String json) {
+        // nests down into the objects to get to the working array
+
+        JSONArray jsonArray = null;
+        try {
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject jsonSearchObject = jsonObject.getJSONObject("search");
+            JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
+            jsonArray = jsonResultsObject.getJSONArray("work");
+        }
+       catch (Exception e) {
+          e.printStackTrace();
+       }
+        return jsonArray;
     }
 }
