@@ -127,4 +127,78 @@ public class ServerController {
 
         return jsonResultString;
     }
+    @GetMapping("/search/{searchTerm}/{sort}")
+    public String getSearchTermWithSort( @PathVariable String searchTerm, @PathVariable String sort) {
+
+        // needs to take in the searchTerm passed in from the CLI app.
+
+        System.out.println(searchTerm);
+        System.out.println(sort);
+        if ( searchTerm == null || searchTerm.isBlank()) {
+            return " You must enter something for the search to work";
+        }
+
+        String jsonResultString = "";
+        // Need to write a get request to GoodReads
+        try {
+
+            searchTerm = searchTerm.replaceAll("\\s", "");
+
+            HttpClient httpClient = HttpClient.newHttpClient();
+
+            // generate get to GoodReads
+            HttpRequest GETRequest = HttpRequest.newBuilder()
+                    .uri(new URI("https://www.goodreads.com/search/index.xml?q="+searchTerm+"&key=" + devKey +"&search=" + sort))
+                    .GET()
+                    .build();
+
+            // gets data back from good reads.
+            HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
+
+            // convert into json format Jackson
+            XmlMapper xmlMapper = new XmlMapper();
+            JsonNode node = xmlMapper.readTree(response.body());
+
+            ObjectMapper jsonMapper = new ObjectMapper();
+            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            String json = jsonMapper.writeValueAsString(node);
+
+            // moving into nested objects.
+            JSONObject jsonObject = new JSONObject(json);
+            JSONObject jsonSearchObject = jsonObject.getJSONObject("search");
+            JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
+            JSONArray workArray = jsonResultsObject.getJSONArray("work");
+
+            List<Book> bookList = new ArrayList<>();
+            // grabs each object in array
+            for (Object object:workArray) {
+                // grab the best_book object
+                String objectS = object.toString();
+                JSONObject temp = new JSONObject(objectS);
+                JSONObject jsonBestBookObject = temp.getJSONObject("best_book");
+                // grab author obj
+                JSONObject jsonAuth = jsonBestBookObject.getJSONObject("author");
+
+                //populate book object and list
+                Book book = new Book();
+                book.setTitle((String) jsonBestBookObject.get("title"));
+                book.setAuthor((String) jsonAuth.get("name"));
+                book.setImage_url((String) jsonBestBookObject.get("image_url"));
+                bookList.add(book);
+            }
+
+            // create pretty result.
+            Gson gs = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .disableHtmlEscaping()
+                    .create();
+            jsonResultString = gs.toJson(bookList);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jsonResultString;
+    }
 }
