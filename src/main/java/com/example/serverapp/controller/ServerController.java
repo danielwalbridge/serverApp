@@ -112,19 +112,12 @@ public class ServerController {
                 book.setImage_url((String) jsonBestBookObject.get("image_url"));
                 bookList.add(book);
             }
-
             // create pretty result.
-            Gson gs = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .disableHtmlEscaping()
-                    .create();
-            jsonResultString = gs.toJson(bookList);
-
+            jsonResultString = createPrettyJsonResult(bookList);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return jsonResultString;
     }
     @GetMapping("/search/{searchTerm}/{sort}")
@@ -186,19 +179,25 @@ public class ServerController {
                 book.setImage_url((String) jsonBestBookObject.get("image_url"));
                 bookList.add(book);
             }
-
             // create pretty result.
-            Gson gs = new GsonBuilder()
-                    .setPrettyPrinting()
-                    .disableHtmlEscaping()
-                    .create();
-            jsonResultString = gs.toJson(bookList);
-
+            jsonResultString = createPrettyJsonResult(bookList);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return jsonResultString;
+    }
+
+    public String createPrettyJsonResult(List<Book> bookList) {
+        if (bookList.isEmpty()) {
+            return "no results found";
+        }
+        else {
+            Gson gs = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .disableHtmlEscaping()
+                    .create();
+            return gs.toJson(bookList);
+        }
     }
 }
