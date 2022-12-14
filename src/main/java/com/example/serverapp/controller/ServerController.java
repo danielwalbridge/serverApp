@@ -1,6 +1,5 @@
 package com.example.serverapp.controller;
 
-import com.example.serverapp.communication.ServerCommunication;
 import com.example.serverapp.model.Book;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +9,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,10 +27,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/server")
 public class ServerController {
-
-    @Autowired
-    private ServerCommunication serverCommunication;
-
     @Value("${GoodReadsAPIKey}")
     private String devKey;
 
