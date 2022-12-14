@@ -68,6 +68,8 @@ public class ServerController {
         // Need to write a get request to GoodReads
         try {
 
+            searchTerm = searchTerm.replaceAll("\\s", "");
+
             HttpClient httpClient = HttpClient.newHttpClient();
 
             // generate get to GoodReads
