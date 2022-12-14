@@ -36,11 +36,6 @@ public class ServerController {
     @Value("${GoodReadsAPIKey}")
     private String devKey;
 
-    @GetMapping("/test")
-    public String getData() {
-        return "from SERVER-SERVICE " + serverCommunication.getConsoleInfo();
-    }
-
     @GetMapping("/host")
     public String geHostData() {
         System.out.println("getHostData Method being called");
