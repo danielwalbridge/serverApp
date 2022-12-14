@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +64,7 @@ public class ServerController {
             return " You must enter something for the search to work";
         }
 
+        String jsonResultString = "";
         // Need to write a get request to GoodReads
         try {
 
@@ -108,12 +111,18 @@ public class ServerController {
                 bookList.add(book);
             }
 
-            System.out.println(bookList);
+            // create pretty result.
+            Gson gs = new GsonBuilder()
+                    .setPrettyPrinting()
+                    .disableHtmlEscaping()
+                    .create();
+            jsonResultString = gs.toJson(bookList);
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-
-        return searchTerm;
+        return jsonResultString;
     }
 }
