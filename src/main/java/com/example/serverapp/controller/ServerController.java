@@ -24,7 +24,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -45,7 +44,6 @@ public class ServerController {
     @GetMapping("/host")
     public String geHostData() {
         System.out.println("getHostData Method being called");
-
         InetAddress ip = null;
         String hostname = "";
         try {
@@ -58,21 +56,15 @@ public class ServerController {
     }
     @GetMapping("/search/{searchTerm}")
     public String getSearchTerm( @PathVariable String searchTerm) {
-
-        // needs to take in the searchTerm passed in from the CLI app.
         if ( searchTerm == null || searchTerm.isBlank()) {
             return " You must enter something for the search to work";
         }
 
         String jsonResultString = "";
-        // Need to write a get request to GoodReads
         try {
-
             searchTerm = searchTerm.replaceAll("\\s", "");
 
             HttpClient httpClient = HttpClient.newHttpClient();
-
-            // generate get to GoodReads
             HttpRequest GETRequest = HttpRequest.newBuilder()
                     .uri(new URI("https://www.goodreads.com/search/index.xml?q="+searchTerm+"&key=" + devKey))
                     .GET()
@@ -80,15 +72,8 @@ public class ServerController {
 
             // gets data back from good reads.
             HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
-
             // convert into json format
-            XmlMapper xmlMapper = new XmlMapper();
-            JsonNode node = xmlMapper.readTree(response.body());
-
-            ObjectMapper jsonMapper = new ObjectMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            String json = jsonMapper.writeValueAsString(node);
-
+            String json = convertXMLToJson(response);
             // moving into nested objects.
             JSONArray workArray = populateJSONArrayAfterNesting(json);
             // populate book list
@@ -103,24 +88,15 @@ public class ServerController {
     }
     @GetMapping("/search/{searchTerm}/{sort}")
     public String getSearchTermWithSort( @PathVariable String searchTerm, @PathVariable String sort) {
-
-        // needs to take in the searchTerm passed in from the CLI app.
-
-        System.out.println(searchTerm);
-        System.out.println(sort);
         if ( searchTerm == null || searchTerm.isBlank()) {
             return " You must enter something for the search to work";
         }
 
         String jsonResultString = "";
-        // Need to write a get request to GoodReads
         try {
-
             searchTerm = searchTerm.replaceAll("\\s", "");
 
             HttpClient httpClient = HttpClient.newHttpClient();
-
-            // generate get to GoodReads
             HttpRequest GETRequest = HttpRequest.newBuilder()
                     .uri(new URI("https://www.goodreads.com/search/index.xml?q="+searchTerm+"&key=" + devKey +"&search=" + sort))
                     .GET()
@@ -128,15 +104,8 @@ public class ServerController {
 
             // gets data back from good reads.
             HttpResponse<String> response = httpClient.send(GETRequest, HttpResponse.BodyHandlers.ofString());
-
             // convert into json format
-            XmlMapper xmlMapper = new XmlMapper();
-            JsonNode node = xmlMapper.readTree(response.body());
-
-            ObjectMapper jsonMapper = new ObjectMapper();
-            jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-            String json = jsonMapper.writeValueAsString(node);
-
+            String json = convertXMLToJson(response);
             // moving into nested objects.
             JSONArray workArray = populateJSONArrayAfterNesting(json);
             // populate book list
@@ -202,5 +171,22 @@ public class ServerController {
           e.printStackTrace();
        }
         return jsonArray;
+    }
+
+    public String convertXMLToJson(HttpResponse<String> response) {
+        XmlMapper xmlMapper = new XmlMapper();
+
+        ObjectMapper jsonMapper = new ObjectMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        String json ="";
+        try {
+            JsonNode node = xmlMapper.readTree(response.body());
+             json = jsonMapper.writeValueAsString(node);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return json;
     }
 }
