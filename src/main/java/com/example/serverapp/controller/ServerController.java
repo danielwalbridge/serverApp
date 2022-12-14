@@ -95,23 +95,8 @@ public class ServerController {
             JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
             JSONArray workArray = jsonResultsObject.getJSONArray("work");
 
-            List<Book> bookList = new ArrayList<>();
-            // grabs each object in array
-            for (Object object:workArray) {
-                // grab the best_book object
-                String objectS = object.toString();
-                JSONObject temp = new JSONObject(objectS);
-                JSONObject jsonBestBookObject = temp.getJSONObject("best_book");
-                // grab author obj
-                JSONObject jsonAuth = jsonBestBookObject.getJSONObject("author");
-
-                //populate book object and list
-                Book book = new Book();
-                book.setTitle((String) jsonBestBookObject.get("title"));
-                book.setAuthor((String) jsonAuth.get("name"));
-                book.setImage_url((String) jsonBestBookObject.get("image_url"));
-                bookList.add(book);
-            }
+            // populate book list
+            List<Book> bookList = populateBookListFromJSONArray(workArray);
             // create pretty result.
             jsonResultString = createPrettyJsonResult(bookList);
 
@@ -162,23 +147,7 @@ public class ServerController {
             JSONObject jsonResultsObject = jsonSearchObject.getJSONObject("results");
             JSONArray workArray = jsonResultsObject.getJSONArray("work");
 
-            List<Book> bookList = new ArrayList<>();
-            // grabs each object in array
-            for (Object object:workArray) {
-                // grab the best_book object
-                String objectS = object.toString();
-                JSONObject temp = new JSONObject(objectS);
-                JSONObject jsonBestBookObject = temp.getJSONObject("best_book");
-                // grab author obj
-                JSONObject jsonAuth = jsonBestBookObject.getJSONObject("author");
-
-                //populate book object and list
-                Book book = new Book();
-                book.setTitle((String) jsonBestBookObject.get("title"));
-                book.setAuthor((String) jsonAuth.get("name"));
-                book.setImage_url((String) jsonBestBookObject.get("image_url"));
-                bookList.add(book);
-            }
+            List<Book> bookList = populateBookListFromJSONArray(workArray);
             // create pretty result.
             jsonResultString = createPrettyJsonResult(bookList);
 
@@ -199,5 +168,30 @@ public class ServerController {
                     .create();
             return gs.toJson(bookList);
         }
+    }
+
+    public List<Book> populateBookListFromJSONArray(JSONArray jsonArray) {
+        if (jsonArray.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<Book> bookList = new ArrayList<>();
+
+        for (Object object:jsonArray) {
+            // grab the best_book object
+            String objectS = object.toString();
+            JSONObject temp = new JSONObject(objectS);
+            JSONObject jsonBestBookObject = temp.getJSONObject("best_book");
+            // grab author obj
+            JSONObject jsonAuth = jsonBestBookObject.getJSONObject("author");
+
+            //populate book object and list
+            Book book = new Book();
+            book.setTitle((String) jsonBestBookObject.get("title"));
+            book.setAuthor((String) jsonAuth.get("name"));
+            book.setImage_url((String) jsonBestBookObject.get("image_url"));
+            bookList.add(book);
+        }
+        return bookList;
     }
 }
